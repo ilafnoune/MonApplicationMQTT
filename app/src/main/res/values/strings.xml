@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Mon Application MQTT</string>
+    <string name="action_parametres">Paramètres</string>
+    <string name="action_connexion">Connecter</string>
+    <string name="latitude">latitude</string>
+    <string name="longitude">longitude</string>
+    <string name="test_mqtt">Test MQTT</string>
+    <string name="txtEtatConnection">Non connecté</string>
+</resources>
