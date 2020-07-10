@@ -38,8 +38,8 @@ public class ClientMQTT {
     String serverUri = "tcp://test.mosquitto.org";
     int portTTN = 1883;
     String clientId = "LeVelo";
-    String subscriptionTopic = "Freebike/251996IM/State";
-    String publishTopic = "Freebike/251996IM/geoloc";
+    String subscriptionTopic = "Freebike/251996/State";
+    String publishTopic = "Freebike/251996/geoloc";
     Location localisation;
 
     //String username = "mes_ruches";

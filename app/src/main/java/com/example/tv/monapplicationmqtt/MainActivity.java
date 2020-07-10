@@ -37,7 +37,7 @@ import java.util.Date;
  * @class MainActivity
  * @brief Activité principale de l'application (Thread UI)
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity  {
     private static final String TAG = "MainActivity"; //!< le TAG de la classe pour les logs
     final int ID_Intent_ParametresConnexion = 1; //!< l'ID de l'Intent ParametresConnexion
     ClientMQTT clientMQTT = null;
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String publishTopicStatus = "Freebike/251996/Status";
     String publishStart = "Start!";
     String publishStop = "Stop!";
+    String publishFinish = "Finish";
 
 
     int increment = 4;
@@ -84,10 +85,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         clientMQTT.textViewLatitude = (TextView) this.findViewById(R.id.textViewLatitude);
         clientMQTT.textViewLongitude = (TextView) this.findViewById(R.id.textViewLongitude);
 
-        Button pause = findViewById(R.id.pause);
-        Button resume = findViewById(R.id.resume);
-        pause.setOnClickListener(this);
-        resume.setOnClickListener(this);
+        //Button pause = findViewById(R.id.pause);
+        //Button resume = findViewById(R.id.resume);
+        final Button finish = findViewById(R.id.Finish);
+        final Button startpause = findViewById(R.id.start);
+        //pause.setOnClickListener(this);
+        //resume.setOnClickListener(this);
+        startpause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String check = startpause.getText().toString();
+                if (check == "Start") {
+                    clientMQTT.publier(publishStart,publishTopicStatus);
+                    startpause.setText("Pause");
+                    finish.setVisibility(View.VISIBLE);
+                }
+                else {
+                    clientMQTT.publier(publishStop,publishTopicStatus);
+                    startpause.setText("Start");
+                }
+            }
+        });
+        finish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clientMQTT.publier(publishFinish,publishTopicStatus);
+                startpause.setText("Start");
+                finish.setVisibility(View.INVISIBLE);
+
+            }
+        });
+
         Log.d("GPS", "onCreate");
         //clientMQTT.initialiserLocalisation();
     }
@@ -190,26 +218,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @fn onActivityResult
      * @brief
      */
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         Log.d(TAG, "requestCode=" + requestCode);
         Log.d(TAG, "resultCode=" + resultCode);
-        if (requestCode == ID_Intent_ParametresConnexion)
-        {
+        if (requestCode == ID_Intent_ParametresConnexion) {
             //if(resultCode == RESULT_CANCELED)
-                //...
-            if (resultCode == RESULT_OK)
-            {
+            //...
+            if (resultCode == RESULT_OK) {
                 serverTTN = intent.getStringExtra("serverTTN");
                 portTTN = intent.getIntExtra("portTTN", portTTN);
                 applicationId = intent.getStringExtra("applicationId");
                 deviceId = intent.getStringExtra("deviceId");
                 //password = intent.getStringExtra("password");
 
-                Log.d(TAG,"serverTTN : " + serverTTN);
-                Log.d(TAG,"portTTN : " + portTTN);
-                Log.d(TAG,"applicationId : " + applicationId);
-                Log.d(TAG,"deviceId : " + deviceId);
+                Log.d(TAG, "serverTTN : " + serverTTN);
+                Log.d(TAG, "portTTN : " + portTTN);
+                Log.d(TAG, "applicationId : " + applicationId);
+                Log.d(TAG, "deviceId : " + deviceId);
                 //Log.d(TAG,"password : " + password);
 
                 clientMQTT.setParametres(serverTTN, portTTN, applicationId, deviceId);
@@ -267,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
+   /* @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.pause:
@@ -276,6 +302,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.resume:
                 clientMQTT.publier(publishStart, publishTopicStatus);
                 break;
-        }
-    }
+        }*/
+
 }
