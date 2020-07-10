@@ -127,7 +127,7 @@ public class ClientMQTT {
                     initialiserLocalisation();
                     //publier("hello-world");
                     Log.d("GPS","PUBLISH OK");
-                    publier(localisation.getLatitude() + " , " + localisation.getLongitude());
+                    publier(localisation.getLatitude() + " , " + localisation.getLongitude(), publishTopic);
                 }
 
                 @Override
@@ -300,7 +300,7 @@ public class ClientMQTT {
         }
     }
 
-    public void publier(String publishMessage) {
+    public void publier(String publishMessage, String publishTopic) {
 
         final MqttMessage message = new MqttMessage();
         message.setPayload(publishMessage.getBytes());

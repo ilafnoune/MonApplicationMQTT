@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +37,7 @@ import java.util.Date;
  * @class MainActivity
  * @brief Activité principale de l'application (Thread UI)
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "MainActivity"; //!< le TAG de la classe pour les logs
     final int ID_Intent_ParametresConnexion = 1; //!< l'ID de l'Intent ParametresConnexion
     ClientMQTT clientMQTT = null;
@@ -50,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
 
     TextView txtEtatConnexion;
     TextView txtResultatRequete;
-
+    String publishTopicStatus = "Freebike/251996/Status";
+    String publishStart = "Start!";
+    String publishStop = "Stop!";
 
 
     int increment = 4;
@@ -80,6 +84,10 @@ public class MainActivity extends AppCompatActivity {
         clientMQTT.textViewLatitude = (TextView) this.findViewById(R.id.textViewLatitude);
         clientMQTT.textViewLongitude = (TextView) this.findViewById(R.id.textViewLongitude);
 
+        Button pause = findViewById(R.id.pause);
+        Button resume = findViewById(R.id.resume);
+        pause.setOnClickListener(this);
+        resume.setOnClickListener(this);
         Log.d("GPS", "onCreate");
         //clientMQTT.initialiserLocalisation();
     }
@@ -257,5 +265,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.pause:
+                clientMQTT.publier(publishStop, publishTopicStatus);
+                break;
+            case R.id.resume:
+                clientMQTT.publier(publishStart, publishTopicStatus);
+                break;
+        }
     }
 }
