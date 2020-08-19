@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.Criteria;
@@ -32,12 +36,14 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @class MainActivity
  * @brief Activité principale de l'application (Thread UI)
  */
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private static final String TAG = "MainActivity"; //!< le TAG de la classe pour les logs
     final int ID_Intent_ParametresConnexion = 1; //!< l'ID de l'Intent ParametresConnexion
     ClientMQTT clientMQTT = null;
@@ -52,10 +58,19 @@ public class MainActivity extends AppCompatActivity  {
 
     TextView txtEtatConnexion;
     TextView txtResultatRequete;
-    String publishTopicStatus = "Freebike/251996/Status";
+    String publishTopicStatus = "Freebike/251996/state";
+    String publishAccel = "Freebike/251996/Accel";
     String publishStart = "Start!";
     String publishStop = "Stop!";
     String publishFinish = "Finish";
+    private SensorManager sensorManager;
+    private Sensor sensor;
+    Float xAccel;
+    Float yAccel;
+    Float zAccel;
+
+
+
 
 
     int increment = 4;
@@ -74,12 +89,16 @@ public class MainActivity extends AppCompatActivity  {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        sensorManager.registerListener(MainActivity.this,sensor,SensorManager.SENSOR_DELAY_NORMAL);
 
         // accès aux éléments de l'IHM
         txtEtatConnexion = (TextView) this.findViewById(R.id.txtEtatConnexion);
         txtResultatRequete = (TextView) this.findViewById(R.id.txtResultatRequete);
 
         clientMQTT = new ClientMQTT(this.getApplicationContext());
+
 
 
         clientMQTT.textViewLatitude = (TextView) this.findViewById(R.id.textViewLatitude);
@@ -97,8 +116,15 @@ public class MainActivity extends AppCompatActivity  {
                 String check = startpause.getText().toString();
                 if (check == "Start") {
                     clientMQTT.publier(publishStart,publishTopicStatus);
+
                     startpause.setText("Pause");
                     finish.setVisibility(View.VISIBLE);
+                    Timer t = new Timer();
+                    t.scheduleAtFixedRate(new TimerTask() {
+                        @Override
+                        public void run() {
+                            clientMQTT.publier("X = "+xAccel+", Y ="+yAccel+", Z ="+zAccel,publishAccel);
+                        }},0,1000);
                 }
                 else {
                     clientMQTT.publier(publishStop,publishTopicStatus);
@@ -117,9 +143,20 @@ public class MainActivity extends AppCompatActivity  {
         });
 
         Log.d("GPS", "onCreate");
-        //clientMQTT.initialiserLocalisation();
+        clientMQTT.initialiserLocalisation();
+    }
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int j){
+
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent){
+        Log.d(TAG, "onSensorChanged: ="+sensorEvent.values[0]+"Y:"+sensorEvent.values[1]+"Z:"+sensorEvent.values[2]);
+        xAccel = sensorEvent.values[0];
+        yAccel = sensorEvent.values[1];
+        zAccel = sensorEvent.values[2];
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();

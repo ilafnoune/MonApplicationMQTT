@@ -38,8 +38,8 @@ public class ClientMQTT {
     String serverUri = "tcp://test.mosquitto.org";
     int portTTN = 1883;
     String clientId = "LeVelo";
-    String subscriptionTopic = "Freebike/251996/State";
-    String publishTopic = "Freebike/251996/geoloc";
+    String subscriptionTopic = "Freebike/251996/Lock";
+    String publishTopic = "Freebike/251996/Geoloc";
     Location localisation;
 
     //String username = "mes_ruches";
@@ -216,22 +216,22 @@ public class ClientMQTT {
 
     LocationListener ecouteurGPS = new LocationListener() {
         @Override
-        public void onLocationChanged(Location localisation) {
+        public void onLocationChanged(Location Locale) {
             Toast.makeText(context.getApplicationContext(), fournisseur + " localisation", Toast.LENGTH_SHORT).show();
 
-            Log.d("GPS", "localisation : " + localisation.toString());
-            String coordonnees = String.format("Latitude : %f - Longitude : %f\n", localisation.getLatitude(), localisation.getLongitude());
+            Log.d("GPS", "localisation : " + Locale.toString());
+            String coordonnees = String.format("Latitude : %f - Longitude : %f\n", Locale.getLatitude(), Locale.getLongitude());
             Log.d("GPS", coordonnees);
-            String autres = String.format("Vitesse : %f - Altitude : %f - Cap : %f\n", localisation.getSpeed(), localisation.getAltitude(), localisation.getBearing());
+            String autres = String.format("Vitesse : %f - Altitude : %f - Cap : %f\n", Locale.getSpeed(), Locale.getAltitude(), Locale.getBearing());
             Log.d("GPS", autres);
             //String timestamp = String.format("Timestamp : %d\n", localisation.getTime());
             //Log.d("GPS", "timestamp : " + timestamp);
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            Date date = new Date(localisation.getTime());
+            Date date = new Date(Locale.getTime());
             Log.d("GPS", sdf.format(date));
 
-            String strLatitude = String.format("Latitude : %f", localisation.getLatitude());
-            String strLongitude = String.format("Longitude : %f", localisation.getLongitude());
+            String strLatitude = String.format("Latitude : %f", Locale.getLatitude());
+            String strLongitude = String.format("Longitude : %f", Locale.getLongitude());
             textViewLatitude.setText(strLatitude);
             textViewLongitude.setText(strLongitude);
         }
